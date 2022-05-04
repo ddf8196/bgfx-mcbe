@@ -135,6 +135,7 @@ typedef enum bgfx_attrib
     BGFX_ATTRIB_TEXCOORD5,                    /** (15) a_texcoord5                    */
     BGFX_ATTRIB_TEXCOORD6,                    /** (16) a_texcoord6                    */
     BGFX_ATTRIB_TEXCOORD7,                    /** (17) a_texcoord7                    */
+    BGFX_ATTRIB_TEXCOORD8,                    /** (18) a_texcoord8                    */
 
     BGFX_ATTRIB_COUNT
 

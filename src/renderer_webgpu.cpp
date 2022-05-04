@@ -2744,6 +2744,7 @@ namespace bgfx { namespace webgpu
 				else if (attr == Attrib::TexCoord5) return "TexCoord5";
 				else if (attr == Attrib::TexCoord6) return "TexCoord6";
 				else if (attr == Attrib::TexCoord7) return "TexCoord7";
+				else if (attr == Attrib::TexCoord8) return "TexCoord8";
 				return "Invalid";
 			};
 

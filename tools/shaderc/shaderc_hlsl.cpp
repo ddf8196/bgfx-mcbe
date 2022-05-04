@@ -184,6 +184,7 @@ namespace bgfx { namespace hlsl
 		{ bgfx::Attrib::TexCoord5, "TEXCOORD",     5 },
 		{ bgfx::Attrib::TexCoord6, "TEXCOORD",     6 },
 		{ bgfx::Attrib::TexCoord7, "TEXCOORD",     7 },
+		{ bgfx::Attrib::TexCoord8, "TEXCOORD",     8 },
 		{ bgfx::Attrib::Count,     "",             0 },
 	};
 

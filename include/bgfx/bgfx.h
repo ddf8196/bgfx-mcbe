@@ -112,6 +112,7 @@ namespace bgfx
 			TexCoord5, //!< a_texcoord5
 			TexCoord6, //!< a_texcoord6
 			TexCoord7, //!< a_texcoord7
+			TexCoord8, //!< a_texcoord7
 
 			Count
 		};

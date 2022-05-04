@@ -66,6 +66,7 @@ static const char* s_attribShortNames[] =
 	"TC5", // TexCoord5
 	"TC6", // TexCoord6
 	"TC7", // TexCoord7
+	"TC8", // TexCoord8
 };
 BX_STATIC_ASSERT(BX_COUNTOF(s_attribShortNames) == bgfx::Attrib::Count);
 

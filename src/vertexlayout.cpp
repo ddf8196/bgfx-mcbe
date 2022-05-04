@@ -157,6 +157,7 @@ namespace bgfx
 		"T5", "Attrib::TexCoord5",
 		"T6", "Attrib::TexCoord6",
 		"T7", "Attrib::TexCoord7",
+		"T8", "Attrib::TexCoord8",
 	};
 	BX_STATIC_ASSERT(BX_COUNTOF(s_attrName) == Attrib::Count*2);
 
@@ -199,6 +200,7 @@ namespace bgfx
 		{ Attrib::TexCoord5, 0x0015 },
 		{ Attrib::TexCoord6, 0x0016 },
 		{ Attrib::TexCoord7, 0x0017 },
+		{ Attrib::TexCoord8, 0x0018 },
 	};
 	BX_STATIC_ASSERT(BX_COUNTOF(s_attribToId) == Attrib::Count);
 
