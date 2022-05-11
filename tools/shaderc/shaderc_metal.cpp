@@ -240,9 +240,6 @@ namespace bgfx { namespace metal
 			bx::write(_writer, un.num, &err);
 			bx::write(_writer, un.regIndex, &err);
 			bx::write(_writer, un.regCount, &err);
-			bx::write(_writer, un.texComponent, &err);
-			bx::write(_writer, un.texDimension, &err);
-			bx::write(_writer, un.texFormat, &err);
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()
