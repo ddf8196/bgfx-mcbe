@@ -2442,7 +2442,7 @@ namespace bgfx { namespace d3d11
 				uint32_t flags = _resolution.reset & (~BGFX_RESET_INTERNAL_FORCE);
 
 				bool resize = true
-					&& !BX_ENABLED(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT) // can't use ResizeBuffers on Windows Phone
+					&& !BX_ENABLED(BX_PLATFORM_XBOXONE)
 					&& (m_resolution.reset&BGFX_RESET_MSAA_MASK) == (flags&BGFX_RESET_MSAA_MASK)
 					;
 
@@ -4708,8 +4708,10 @@ namespace bgfx { namespace d3d11
 	void TextureD3D11::overrideInternal(uintptr_t _ptr)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+
 		const bool readable = (m_srv != NULL);
-		if (readable) {
+		if (readable)
+		{
 			m_srv->GetDesc(&srvDesc);
 		}
 
@@ -4717,7 +4719,8 @@ namespace bgfx { namespace d3d11
 		m_flags |= BGFX_SAMPLER_INTERNAL_SHARED;
 		m_ptr = (ID3D11Resource*)_ptr;
 
-		if (readable) {
+		if (readable)
+		{
 			s_renderD3D11->m_device->CreateShaderResourceView(m_ptr, &srvDesc, &m_srv);
 		}
 	}
