@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -108,7 +108,7 @@ namespace bgfx { namespace gl
 		return context;
 	}
 
-	void GlContext::create(uint32_t /*_width*/, uint32_t /*_height*/)
+	void GlContext::create(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_flags*/)
 	{
 		m_opengl32dll = bx::dlopen("opengl32.dll");
 		BGFX_FATAL(NULL != m_opengl32dll, Fatal::UnableToInitialize, "Failed to load opengl32.dll.");
@@ -349,7 +349,7 @@ namespace bgfx { namespace gl
 
 	void GlContext::destroySwapChain(SwapChainGL*  _swapChain)
 	{
-		BX_DELETE(g_allocator, _swapChain);
+		bx::deleteObject(g_allocator, _swapChain);
 		wglMakeCurrent(m_hdc, m_context);
 	}
 

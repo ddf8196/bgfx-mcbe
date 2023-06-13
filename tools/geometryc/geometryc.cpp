@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -16,6 +16,7 @@ namespace stl = tinystl;
 
 #include <meshoptimizer/src/meshoptimizer.h>
 
+#define CGLTF_VALIDATE_ENABLE_ASSERTS BX_CONFIG_DEBUG
 #define CGLTF_IMPLEMENTATION
 #include <cgltf/cgltf.h>
 
@@ -119,7 +120,7 @@ static bx::Vec3 s_axisVectors[6] =
 
 struct CoordinateSystem
 {
-	bx::Handness::Enum m_handness;
+	bx::Handedness::Enum m_handedness;
 	Axis::Enum         m_up;
 	Axis::Enum         m_forward;
 };
@@ -132,10 +133,10 @@ struct CoordinateSystemMapping
 
 static const CoordinateSystemMapping s_coordinateSystemMappings[] =
 {
-	{ "lh-up+y", { bx::Handness::Left,  Axis::PositiveY, Axis::PositiveZ } },
-	{ "lh-up+z", { bx::Handness::Left,  Axis::PositiveZ, Axis::PositiveY } },
-	{ "rh-up+y", { bx::Handness::Right, Axis::PositiveY, Axis::PositiveZ } },
-	{ "rh-up+z", { bx::Handness::Right, Axis::PositiveZ, Axis::PositiveY } },
+	{ "lh-up+y", { bx::Handedness::Left,  Axis::PositiveY, Axis::PositiveZ } },
+	{ "lh-up+z", { bx::Handedness::Left,  Axis::PositiveZ, Axis::PositiveY } },
+	{ "rh-up+y", { bx::Handedness::Right, Axis::PositiveY, Axis::PositiveZ } },
+	{ "rh-up+z", { bx::Handedness::Right, Axis::PositiveZ, Axis::PositiveY } },
 };
 
 struct Mesh
@@ -458,7 +459,7 @@ void mtxCoordinateTransform(float* _result, const CoordinateSystem& _cs)
 	bx::Vec3 forward = s_axisVectors[_cs.m_forward];
 	bx::Vec3 right   = cross(forward,up);
 
-	if (_cs.m_handness == bx::Handness::Left)
+	if (_cs.m_handedness == bx::Handedness::Left)
 	{
 		right = bx::mul(right, -1.0f);
 	}
@@ -504,7 +505,7 @@ void parseObj(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc)
 	//   https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
 	// Coordinate system is right-handed, but up/forward is not defined, but +Y Up, +Z Forward seems to be a common default
-	_mesh->m_coordinateSystem.m_handness = bx::Handness::Right;
+	_mesh->m_coordinateSystem.m_handedness = bx::Handedness::Right;
 	_mesh->m_coordinateSystem.m_up = Axis::PositiveY;
 	_mesh->m_coordinateSystem.m_forward = Axis::PositiveZ;
 
@@ -623,7 +624,7 @@ void parseObj(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc)
 
 				if (0 == bx::strCmp(argv[0], "vn") )
 				{
-					bx::Vec3 normal(bx::init::None);
+					bx::Vec3 normal(bx::InitNone);
 					bx::fromString(&normal.x, argv[1]);
 					bx::fromString(&normal.y, argv[2]);
 					bx::fromString(&normal.z, argv[3]);
@@ -641,7 +642,7 @@ void parseObj(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc)
 				}
 				else if (0 == bx::strCmp(argv[0], "vt") )
 				{
-					bx::Vec3 texcoord(bx::init::None);
+					bx::Vec3 texcoord(bx::InitNone);
 					texcoord.y = 0.0f;
 					texcoord.z = 0.0f;
 
@@ -782,7 +783,7 @@ void processGltfNode(cgltf_node* _node, Mesh* _mesh, Group* _group, bool _hasBc)
 				{
 					_mesh->m_positions.reserve(_mesh->m_positions.size() + accessorCount);
 
-					bx::Vec3 pos(bx::init::None);
+					bx::Vec3 pos(bx::InitNone);
 
 					for (cgltf_size v = 0; v < accessorCount; ++v)
 					{
@@ -796,7 +797,7 @@ void processGltfNode(cgltf_node* _node, Mesh* _mesh, Group* _group, bool _hasBc)
 					_mesh->m_normals.reserve(_mesh->m_normals.size() + accessorCount);
 
 					hasNormal = true;
-					bx::Vec3 normal(bx::init::None);
+					bx::Vec3 normal(bx::InitNone);
 
 					for (cgltf_size v = 0; v < accessorCount; ++v)
 					{
@@ -810,7 +811,7 @@ void processGltfNode(cgltf_node* _node, Mesh* _mesh, Group* _group, bool _hasBc)
 					_mesh->m_texcoords.reserve(_mesh->m_texcoords.size() + accessorCount);
 
 					hasTexcoord = true;
-					bx::Vec3 texcoord(bx::init::None);
+					bx::Vec3 texcoord(bx::InitNone);
 
 					for (cgltf_size v = 0; v < accessorCount; ++v)
 					{
@@ -881,7 +882,7 @@ void parseGltf(char* _data, uint32_t _size, Mesh* _mesh, bool _hasBc, const bx::
 	// - Gltf 2.0 specification
 	//  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
 
-	_mesh->m_coordinateSystem.m_handness = bx::Handness::Right;
+	_mesh->m_coordinateSystem.m_handedness = bx::Handedness::Right;
 	_mesh->m_coordinateSystem.m_forward  = Axis::PositiveZ;
 	_mesh->m_coordinateSystem.m_up       = Axis::PositiveY;
 
@@ -930,7 +931,7 @@ void help(const char* _error = NULL)
 
 	bx::printf(
 		  "geometryc, bgfx geometry compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2023 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE\n\n"
 		, BGFX_GEOMETRYC_VERSION_MAJOR
 		, BGFX_GEOMETRYC_VERSION_MINOR
@@ -1036,7 +1037,7 @@ int main(int _argc, const char* _argv[])
 	bool hasBc = cmdLine.hasArg("barycentric");
 
 	CoordinateSystem outputCoordinateSystem;
-	outputCoordinateSystem.m_handness = bx::Handness::Left;
+	outputCoordinateSystem.m_handedness = bx::Handedness::Left;
 	outputCoordinateSystem.m_forward = Axis::PositiveZ;
 	outputCoordinateSystem.m_up = Axis::PositiveY;
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_coordinateSystemMappings); ++ii)

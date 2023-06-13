@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -181,11 +181,19 @@ namespace bgfx
 			ATCE,         //!< ATCE RGBA 8 BPP explicit alpha
 			ATCI,         //!< ATCI RGBA 8 BPP interpolated alpha
 			ASTC4x4,      //!< ASTC 4x4 8.0 BPP
+			ASTC5x4,	  //!< ASTC 5x4 6.40 BPP
 			ASTC5x5,      //!< ASTC 5x5 5.12 BPP
+			ASTC6x5,	  //!< ASTC 6x5 4.27 BPP
 			ASTC6x6,      //!< ASTC 6x6 3.56 BPP
 			ASTC8x5,      //!< ASTC 8x5 3.20 BPP
 			ASTC8x6,      //!< ASTC 8x6 2.67 BPP
+			ASTC8x8,	  //!< ASTC 8x8 2.00 BPP
 			ASTC10x5,     //!< ASTC 10x5 2.56 BPP
+			ASTC10x6,	  //!< ASTC 10x6 2.13 BPP
+			ASTC10x8,	  //!< ASTC 10x8 1.60 BPP
+			ASTC10x10,	  //!< ASTC 10x10 1.28 BPP
+			ASTC12x10,	  //!< ASTC 12x10 1.07 BPP
+			ASTC12x12,	  //!< ASTC 12x12 0.89 BPP
 
 			Unknown,      // Compressed formats above.
 
@@ -233,8 +241,11 @@ namespace bgfx
 			RGBA32I,
 			RGBA32U,
 			RGBA32F,
+			B5G6R5,
 			R5G6B5,
+			BGRA4,
 			RGBA4,
+			BGR5A1,
 			RGB5A1,
 			RGB10A2,
 			RG11B10F,
@@ -634,7 +645,7 @@ namespace bgfx
 		TextureFormat::Enum format; //!< Backbuffer format.
 		uint32_t width;             //!< Backbuffer width.
 		uint32_t height;            //!< Backbuffer height.
-		uint32_t reset;	            //!< Reset parameters.
+		uint32_t reset;             //!< Reset parameters.
 		uint8_t  numBackBuffers;    //!< Number of back buffers.
 		uint8_t  maxFrameLatency;   //!< Maximum frame latency.
 	};
@@ -652,17 +663,19 @@ namespace bgfx
 		/// See: `bgfx::RendererType`
 		RendererType::Enum type;
 
-		/// Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
-		/// device.
-		///   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
+		/// Vendor PCI ID. If set to `BGFX_PCI_ID_NONE`, discrete and integrated
+		/// GPUs will be prioritised.
+		///   - `BGFX_PCI_ID_NONE` - Auto-select adapter.
 		///   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
 		///   - `BGFX_PCI_ID_AMD` - AMD adapter.
+		///   - `BGFX_PCI_ID_APPLE` - Apple adapter.
 		///   - `BGFX_PCI_ID_INTEL` - Intel adapter.
-		///   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
+		///   - `BGFX_PCI_ID_NVIDIA` - NVIDIA adapter.
+		///   - `BGFX_PCI_ID_MICROSOFT` - Microsoft adapter.
 		uint16_t vendorId;
 
-		/// Device id. If set to 0 it will select first device, or device with
-		/// matching id.
+		/// Device ID. If set to 0 it will select first device, or device with
+		/// matching ID.
 		uint16_t deviceId;
 
 		uint64_t capabilities; //!< Capabilities initialization mask (default: UINT64_MAX).
@@ -938,12 +951,13 @@ namespace bgfx
 	///
 	struct ViewStats
 	{
-		char    name[256];      //!< View name.
-		ViewId  view;           //!< View id.
-		int64_t cpuTimeBegin;   //!< CPU (submit) begin time.
-		int64_t cpuTimeEnd;     //!< CPU (submit) end time.
-		int64_t gpuTimeBegin;   //!< GPU begin time.
-		int64_t gpuTimeEnd;     //!< GPU end time.
+		char     name[256];      //!< View name.
+		ViewId   view;           //!< View id.
+		int64_t  cpuTimeBegin;   //!< CPU (submit) begin time.
+		int64_t  cpuTimeEnd;     //!< CPU (submit) end time.
+		int64_t  gpuTimeBegin;   //!< GPU begin time.
+		int64_t  gpuTimeEnd;     //!< GPU end time.
+		uint32_t gpuFrameNum;    //!< Frame which generated gpuTimeBegin, gpuTimeEnd.
 	};
 
 	/// Encoder stats.
@@ -981,6 +995,7 @@ namespace bgfx
 		uint32_t numCompute;                //!< Number of compute calls submitted.
 		uint32_t numBlit;                   //!< Number of blit calls submitted.
 		uint32_t maxGpuLatency;             //!< GPU driver latency.
+		uint32_t gpuFrameNum;               //<! Frame which generated gpuTimeBegin, gpuTimeEnd.
 
 		uint16_t numDynamicIndexBuffers;    //!< Number of used dynamic index buffers.
 		uint16_t numDynamicVertexBuffers;   //!< Number of used dynamic vertex buffers.
@@ -1476,10 +1491,11 @@ namespace bgfx
 		/// @param[in] _program Program.
 		/// @param[in] _indirectHandle Indirect buffer.
 		/// @param[in] _start First element in indirect buffer.
-		/// @param[in] _num Number of dispatches.
+		/// @param[in] _num Number of draws.
 		/// @param[in] _depth Depth for sorting.
 		/// @param[in] _flags Discard or preserve states. See `BGFX_DISCARD_*`.
 		///
+		/// @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 		/// @attention C99's equivalent binding is `bgfx_encoder_submit_indirect`.
 		///
 		void submit(
@@ -1488,6 +1504,35 @@ namespace bgfx
 			, IndirectBufferHandle _indirectHandle
 			, uint16_t _start = 0
 			, uint16_t _num = 1
+			, uint32_t _depth = 0
+			, uint8_t _flags = BGFX_DISCARD_ALL
+			);
+
+		/// Submit primitive for rendering with index and instance data info and
+		/// draw count from indirect buffers.
+		///
+		/// @param[in] _id View id.
+		/// @param[in] _program Program.
+		/// @param[in] _indirectHandle Indirect buffer.
+		/// @param[in] _start First element in indirect buffer.
+		/// @param[in] _numHandle Buffer for number of draws. Must be created
+		///   with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+		/// @param[in] _numIndex Element in number buffer.
+		/// @param[in] _numMax Max number of draws.
+		/// @param[in] _depth Depth for sorting.
+		/// @param[in] _flags Discard or preserve states. See `BGFX_DISCARD_*`.
+		///
+		/// @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+		/// @attention C99's equivalent binding is `bgfx_encoder_submit_indirect_count`.
+		///
+		void submit(
+			  ViewId _id
+			, ProgramHandle _program
+			, IndirectBufferHandle _indirectHandle
+			, uint16_t _start
+			, IndexBufferHandle _numHandle
+			, uint32_t _numIndex = 0
+			, uint16_t _numMax = UINT16_MAX
 			, uint32_t _depth = 0
 			, uint8_t _flags = BGFX_DISCARD_ALL
 			);
@@ -2469,9 +2514,8 @@ namespace bgfx
 
 	/// Allocate transient index buffer.
 	///
-	/// @param[out] _tib TransientIndexBuffer structure is filled and is valid
-	///   for the duration of frame, and it can be reused for multiple draw
-	///   calls.
+	/// @param[out] _tib TransientIndexBuffer structure will be filled, and will be valid
+	///   for the duration of frame, and can be reused for multiple draw calls.
 	/// @param[in] _num Number of indices to allocate.
 	/// @param[in] _index32 Set to `true` if input indices will be 32-bit.
 	///
@@ -2485,9 +2529,8 @@ namespace bgfx
 
 	/// Allocate transient vertex buffer.
 	///
-	/// @param[out] _tvb TransientVertexBuffer structure is filled and is valid
-	///   for the duration of frame, and it can be reused for multiple draw
-	///   calls.
+	/// @param[out] _tvb TransientVertexBuffer structure will be filled, and will be valid
+	///   for the duration of frame, and can be reused for multiple draw calls.
 	/// @param[in] _num Number of vertices to allocate.
 	/// @param[in] _layout Vertex layout.
 	///
@@ -2503,14 +2546,12 @@ namespace bgfx
 	/// buffers. If both space requirements are satisfied function returns
 	/// true.
 	///
-	/// @param[out] _tvb TransientVertexBuffer structure is filled and is valid
-	///   for the duration of frame, and it can be reused for multiple draw
-	///   calls.
+	/// @param[out] _tvb TransientVertexBuffer structure will be filled, and will be valid
+	///   for the duration of frame, and can be reused for multiple draw calls.
 	/// @param[in] _layout Vertex layout.
 	/// @param[in] _numVertices Number of vertices to allocate.
-	/// @param[out] _tib TransientIndexBuffer structure is filled and is valid
-	///   for the duration of frame, and it can be reused for multiple draw
-	///   calls.
+	/// @param[out] _tib TransientIndexBuffer structure will be filled, and will be valid
+	///   for the duration of frame, and can be reused for multiple draw calls.
 	/// @param[in] _numIndices Number of indices to allocate.
 	/// @param[in] _index32 Set to `true` if input indices will be 32-bit.
 	///
@@ -2527,9 +2568,8 @@ namespace bgfx
 
 	/// Allocate instance data buffer.
 	///
-	/// @param[out] _idb InstanceDataBuffer structure is filled and is valid
-	///   for duration of frame, and it can be reused for multiple draw
-	///   calls.
+	/// @param[out] _idb InstanceDataBuffer structure will be filled, and will be valid
+	///   for the duration of frame, and can be reused for multiple draw calls.
 	/// @param[in] _num Number of instances.
 	/// @param[in] _stride Instance stride. Must be multiple of 16.
 	///
@@ -3925,10 +3965,11 @@ namespace bgfx
 	/// @param[in] _program Program.
 	/// @param[in] _indirectHandle Indirect buffer.
 	/// @param[in] _start First element in indirect buffer.
-	/// @param[in] _num Number of dispatches.
+	/// @param[in] _num Number of draws.
 	/// @param[in] _depth Depth for sorting.
 	/// @param[in] _flags Discard or preserve states. See `BGFX_DISCARD_*`.
 	///
+	/// @attention Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 	/// @attention C99's equivalent binding is `bgfx_submit_indirect`.
 	///
 	void submit(
@@ -3939,6 +3980,35 @@ namespace bgfx
 		, uint16_t _num   = 1
 		, uint32_t _depth = 0
 		, uint8_t _flags  = BGFX_DISCARD_ALL
+		);
+
+	/// Submit primitive for rendering with index and instance data info and
+	/// draw count from indirect buffers.
+	///
+	/// @param[in] _id View id.
+	/// @param[in] _program Program.
+	/// @param[in] _indirectHandle Indirect buffer.
+	/// @param[in] _start First element in indirect buffer.
+	/// @param[in] _numHandle Buffer for number of draws. Must be created
+	///   with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+	/// @param[in] _numIndex Element in number buffer.
+	/// @param[in] _numMax Max number of draws.
+	/// @param[in] _depth Depth for sorting.
+	/// @param[in] _flags Discard or preserve states. See `BGFX_DISCARD_*`.
+	///
+	/// @attention Availability depends on:`BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+	/// @attention C99's equivalent binding is `bgfx_submit_indirect_count`.
+	///
+	void submit(
+		  ViewId _id
+		, ProgramHandle _program
+		, IndirectBufferHandle _indirectHandle
+		, uint16_t _start
+		, IndexBufferHandle _numHandle
+		, uint32_t _numIndex = 0
+		, uint16_t _numMax = UINT16_MAX
+		, uint32_t _depth = 0
+		, uint8_t _flags = BGFX_DISCARD_ALL
 		);
 
 	/// Set compute index buffer.

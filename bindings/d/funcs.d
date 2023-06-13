@@ -566,8 +566,8 @@ version(BindBgfx_Static)
 	/**
 	 * Allocate transient index buffer.
 	 * Params:
-	 * _tib = TransientIndexBuffer structure is filled and is valid
-	 * for the duration of frame, and it can be reused for multiple draw
+	 * _tib = TransientIndexBuffer structure will be filled, and will be valid
+	 * for the duration of frame, and can be reused for multiple draw
 	 * calls.
 	 * _num = Number of indices to allocate.
 	 * _index32 = Set to `true` if input indices will be 32-bit.
@@ -577,8 +577,8 @@ version(BindBgfx_Static)
 	/**
 	 * Allocate transient vertex buffer.
 	 * Params:
-	 * _tvb = TransientVertexBuffer structure is filled and is valid
-	 * for the duration of frame, and it can be reused for multiple draw
+	 * _tvb = TransientVertexBuffer structure will be filled, and will be valid
+	 * for the duration of frame, and can be reused for multiple draw
 	 * calls.
 	 * _num = Number of vertices to allocate.
 	 * _layout = Vertex layout.
@@ -590,13 +590,13 @@ version(BindBgfx_Static)
 	 * buffers. If both space requirements are satisfied function returns
 	 * true.
 	 * Params:
-	 * _tvb = TransientVertexBuffer structure is filled and is valid
-	 * for the duration of frame, and it can be reused for multiple draw
+	 * _tvb = TransientVertexBuffer structure will be filled, and will be valid
+	 * for the duration of frame, and can be reused for multiple draw
 	 * calls.
 	 * _layout = Vertex layout.
 	 * _numVertices = Number of vertices to allocate.
-	 * _tib = TransientIndexBuffer structure is filled and is valid
-	 * for the duration of frame, and it can be reused for multiple draw
+	 * _tib = TransientIndexBuffer structure will be filled, and will be valid
+	 * for the duration of frame, and can be reused for multiple draw
 	 * calls.
 	 * _numIndices = Number of indices to allocate.
 	 * _index32 = Set to `true` if input indices will be 32-bit.
@@ -606,8 +606,8 @@ version(BindBgfx_Static)
 	/**
 	 * Allocate instance data buffer.
 	 * Params:
-	 * _idb = InstanceDataBuffer structure is filled and is valid
-	 * for duration of frame, and it can be reused for multiple draw
+	 * _idb = InstanceDataBuffer structure will be filled, and will be valid
+	 * for duration of frame, and can be reused for multiple draw
 	 * calls.
 	 * _num = Number of instances.
 	 * _stride = Instance stride. Must be multiple of 16.
@@ -1526,16 +1526,35 @@ version(BindBgfx_Static)
 	/**
 	 * Submit primitive for rendering with index and instance data info from
 	 * indirect buffer.
+	 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 	 * Params:
 	 * _id = View id.
 	 * _program = Program.
 	 * _indirectHandle = Indirect buffer.
 	 * _start = First element in indirect buffer.
-	 * _num = Number of dispatches.
+	 * _num = Number of draws.
 	 * _depth = Depth for sorting.
 	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
 	void bgfx_encoder_submit_indirect(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, ubyte _flags);
+	
+	/**
+	 * Submit primitive for rendering with index and instance data info and
+	 * draw count from indirect buffers.
+	 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+	 * Params:
+	 * _id = View id.
+	 * _program = Program.
+	 * _indirectHandle = Indirect buffer.
+	 * _start = First element in indirect buffer.
+	 * _numHandle = Buffer for number of draws. Must be
+	 *   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+	 * _numIndex = Element in number buffer.
+	 * _numMax = Max number of draws.
+	 * _depth = Depth for sorting.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
+	 */
+	void bgfx_encoder_submit_indirect_count(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, bgfx_index_buffer_handle_t _numHandle, uint _numIndex, ushort _numMax, uint _depth, ubyte _flags);
 	
 	/**
 	 * Set compute index buffer.
@@ -2026,16 +2045,35 @@ version(BindBgfx_Static)
 	/**
 	 * Submit primitive for rendering with index and instance data info from
 	 * indirect buffer.
+	 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 	 * Params:
 	 * _id = View id.
 	 * _program = Program.
 	 * _indirectHandle = Indirect buffer.
 	 * _start = First element in indirect buffer.
-	 * _num = Number of dispatches.
+	 * _num = Number of draws.
 	 * _depth = Depth for sorting.
 	 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 	 */
 	void bgfx_submit_indirect(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, ubyte _flags);
+	
+	/**
+	 * Submit primitive for rendering with index and instance data info and
+	 * draw count from indirect buffers.
+	 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+	 * Params:
+	 * _id = View id.
+	 * _program = Program.
+	 * _indirectHandle = Indirect buffer.
+	 * _start = First element in indirect buffer.
+	 * _numHandle = Buffer for number of draws. Must be
+	 *   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+	 * _numIndex = Element in number buffer.
+	 * _numMax = Max number of draws.
+	 * _depth = Depth for sorting.
+	 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
+	 */
+	void bgfx_submit_indirect_count(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, bgfx_index_buffer_handle_t _numHandle, uint _numIndex, ushort _numMax, uint _depth, ubyte _flags);
 	
 	/**
 	 * Set compute index buffer.
@@ -2761,8 +2799,8 @@ else
 		/**
 		 * Allocate transient index buffer.
 		 * Params:
-		 * _tib = TransientIndexBuffer structure is filled and is valid
-		 * for the duration of frame, and it can be reused for multiple draw
+		 * _tib = TransientIndexBuffer structure will be filled, and will be valid
+		 * for the duration of frame, and can be reused for multiple draw
 		 * calls.
 		 * _num = Number of indices to allocate.
 		 * _index32 = Set to `true` if input indices will be 32-bit.
@@ -2773,8 +2811,8 @@ else
 		/**
 		 * Allocate transient vertex buffer.
 		 * Params:
-		 * _tvb = TransientVertexBuffer structure is filled and is valid
-		 * for the duration of frame, and it can be reused for multiple draw
+		 * _tvb = TransientVertexBuffer structure will be filled, and will be valid
+		 * for the duration of frame, and can be reused for multiple draw
 		 * calls.
 		 * _num = Number of vertices to allocate.
 		 * _layout = Vertex layout.
@@ -2787,13 +2825,13 @@ else
 		 * buffers. If both space requirements are satisfied function returns
 		 * true.
 		 * Params:
-		 * _tvb = TransientVertexBuffer structure is filled and is valid
-		 * for the duration of frame, and it can be reused for multiple draw
+		 * _tvb = TransientVertexBuffer structure will be filled, and will be valid
+		 * for the duration of frame, and can be reused for multiple draw
 		 * calls.
 		 * _layout = Vertex layout.
 		 * _numVertices = Number of vertices to allocate.
-		 * _tib = TransientIndexBuffer structure is filled and is valid
-		 * for the duration of frame, and it can be reused for multiple draw
+		 * _tib = TransientIndexBuffer structure will be filled, and will be valid
+		 * for the duration of frame, and can be reused for multiple draw
 		 * calls.
 		 * _numIndices = Number of indices to allocate.
 		 * _index32 = Set to `true` if input indices will be 32-bit.
@@ -2804,8 +2842,8 @@ else
 		/**
 		 * Allocate instance data buffer.
 		 * Params:
-		 * _idb = InstanceDataBuffer structure is filled and is valid
-		 * for duration of frame, and it can be reused for multiple draw
+		 * _idb = InstanceDataBuffer structure will be filled, and will be valid
+		 * for duration of frame, and can be reused for multiple draw
 		 * calls.
 		 * _num = Number of instances.
 		 * _stride = Instance stride. Must be multiple of 16.
@@ -3806,17 +3844,37 @@ else
 		/**
 		 * Submit primitive for rendering with index and instance data info from
 		 * indirect buffer.
+		 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 		 * Params:
 		 * _id = View id.
 		 * _program = Program.
 		 * _indirectHandle = Indirect buffer.
 		 * _start = First element in indirect buffer.
-		 * _num = Number of dispatches.
+		 * _num = Number of draws.
 		 * _depth = Depth for sorting.
 		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
 		alias da_bgfx_encoder_submit_indirect = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, ubyte _flags);
 		da_bgfx_encoder_submit_indirect bgfx_encoder_submit_indirect;
+		
+		/**
+		 * Submit primitive for rendering with index and instance data info and
+		 * draw count from indirect buffers.
+		 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+		 * Params:
+		 * _id = View id.
+		 * _program = Program.
+		 * _indirectHandle = Indirect buffer.
+		 * _start = First element in indirect buffer.
+		 * _numHandle = Buffer for number of draws. Must be
+		 *   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+		 * _numIndex = Element in number buffer.
+		 * _numMax = Max number of draws.
+		 * _depth = Depth for sorting.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
+		 */
+		alias da_bgfx_encoder_submit_indirect_count = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, bgfx_index_buffer_handle_t _numHandle, uint _numIndex, ushort _numMax, uint _depth, ubyte _flags);
+		da_bgfx_encoder_submit_indirect_count bgfx_encoder_submit_indirect_count;
 		
 		/**
 		 * Set compute index buffer.
@@ -4351,17 +4409,37 @@ else
 		/**
 		 * Submit primitive for rendering with index and instance data info from
 		 * indirect buffer.
+		 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT`.
 		 * Params:
 		 * _id = View id.
 		 * _program = Program.
 		 * _indirectHandle = Indirect buffer.
 		 * _start = First element in indirect buffer.
-		 * _num = Number of dispatches.
+		 * _num = Number of draws.
 		 * _depth = Depth for sorting.
 		 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 		 */
 		alias da_bgfx_submit_indirect = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, ubyte _flags);
 		da_bgfx_submit_indirect bgfx_submit_indirect;
+		
+		/**
+		 * Submit primitive for rendering with index and instance data info and
+		 * draw count from indirect buffers.
+		 * Attention: Availability depends on: `BGFX_CAPS_DRAW_INDIRECT_COUNT`.
+		 * Params:
+		 * _id = View id.
+		 * _program = Program.
+		 * _indirectHandle = Indirect buffer.
+		 * _start = First element in indirect buffer.
+		 * _numHandle = Buffer for number of draws. Must be
+		 *   created with `BGFX_BUFFER_INDEX32` and `BGFX_BUFFER_DRAW_INDIRECT`.
+		 * _numIndex = Element in number buffer.
+		 * _numMax = Max number of draws.
+		 * _depth = Depth for sorting.
+		 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
+		 */
+		alias da_bgfx_submit_indirect_count = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, bgfx_index_buffer_handle_t _numHandle, uint _numIndex, ushort _numMax, uint _depth, ubyte _flags);
+		da_bgfx_submit_indirect_count bgfx_submit_indirect_count;
 		
 		/**
 		 * Set compute index buffer.

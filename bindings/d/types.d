@@ -18,7 +18,7 @@ enum expandEnum(EnumType, string fqnEnumType = EnumType.stringof) = (){
 
 extern(C) @nogc nothrow:
 
-enum uint BGFX_API_VERSION = 115;
+enum uint BGFX_API_VERSION = 118;
 
 alias bgfx_view_id_t = ushort;
 
@@ -373,6 +373,7 @@ enum uint BGFX_RESET_HDR10 = 0x00010000; /// Enable HDR10 rendering.
 enum uint BGFX_RESET_HIDPI = 0x00020000; /// Enable HiDPI rendering.
 enum uint BGFX_RESET_DEPTH_CLAMP = 0x00040000; /// Enable depth clamp.
 enum uint BGFX_RESET_SUSPEND = 0x00080000; /// Suspend rendering.
+enum uint BGFX_RESET_TRANSPARENT_BACKBUFFER = 0x00100000; /// Transparent backbuffer. Availability depends on: `BGFX_CAPS_TRANSPARENT_BACKBUFFER`.
 
 enum uint BGFX_RESET_FULLSCREEN_SHIFT = 0;
 enum uint BGFX_RESET_FULLSCREEN_MASK = 0x00000001;
@@ -399,16 +400,18 @@ enum ulong BGFX_CAPS_SWAP_CHAIN = 0x0000000000008000; /// Multiple windows are s
 enum ulong BGFX_CAPS_TEXTURE_2D_ARRAY = 0x0000000000010000; /// 2D texture array is supported.
 enum ulong BGFX_CAPS_TEXTURE_3D = 0x0000000000020000; /// 3D textures are supported.
 enum ulong BGFX_CAPS_TEXTURE_BLIT = 0x0000000000040000; /// Texture blit is supported.
-enum ulong BGFX_CAPS_TEXTURE_COMPARE_RESERVED = 0x0000000000080000;
-enum ulong BGFX_CAPS_TEXTURE_COMPARE_LEQUAL = 0x0000000000100000; /// Texture compare less equal mode is supported.
-enum ulong BGFX_CAPS_TEXTURE_CUBE_ARRAY = 0x0000000000200000; /// Cubemap texture array is supported.
-enum ulong BGFX_CAPS_TEXTURE_DIRECT_ACCESS = 0x0000000000400000; /// CPU direct access to GPU texture memory.
-enum ulong BGFX_CAPS_TEXTURE_READ_BACK = 0x0000000000800000; /// Read-back texture is supported.
-enum ulong BGFX_CAPS_VERTEX_ATTRIB_HALF = 0x0000000001000000; /// Vertex attribute half-float is supported.
-enum ulong BGFX_CAPS_VERTEX_ATTRIB_UINT10 = 0x0000000002000000; /// Vertex attribute 10_10_10_2 is supported.
-enum ulong BGFX_CAPS_VERTEX_ID = 0x0000000004000000; /// Rendering with VertexID only is supported.
-enum ulong BGFX_CAPS_VIEWPORT_LAYER_ARRAY = 0x0000000008000000; /// Viewport layer is available in vertex shader.
-enum ulong BGFX_CAPS_TEXTURE_COMPARE_ALL = 0x0000000000180000; /// All texture compare modes are supported.
+enum ulong BGFX_CAPS_TRANSPARENT_BACKBUFFER = 0x0000000000080000; /// Transparent back buffer supported.
+enum ulong BGFX_CAPS_TEXTURE_COMPARE_RESERVED = 0x0000000000100000;
+enum ulong BGFX_CAPS_TEXTURE_COMPARE_LEQUAL = 0x0000000000200000; /// Texture compare less equal mode is supported.
+enum ulong BGFX_CAPS_TEXTURE_CUBE_ARRAY = 0x0000000000400000; /// Cubemap texture array is supported.
+enum ulong BGFX_CAPS_TEXTURE_DIRECT_ACCESS = 0x0000000000800000; /// CPU direct access to GPU texture memory.
+enum ulong BGFX_CAPS_TEXTURE_READ_BACK = 0x0000000001000000; /// Read-back texture is supported.
+enum ulong BGFX_CAPS_VERTEX_ATTRIB_HALF = 0x0000000002000000; /// Vertex attribute half-float is supported.
+enum ulong BGFX_CAPS_VERTEX_ATTRIB_UINT10 = 0x0000000004000000; /// Vertex attribute 10_10_10_2 is supported.
+enum ulong BGFX_CAPS_VERTEX_ID = 0x0000000008000000; /// Rendering with VertexID only is supported.
+enum ulong BGFX_CAPS_VIEWPORT_LAYER_ARRAY = 0x0000000010000000; /// Viewport layer is available in vertex shader.
+enum ulong BGFX_CAPS_DRAW_INDIRECT_COUNT = 0x0000000020000000; /// Draw indirect with indirect count is supported.
+enum ulong BGFX_CAPS_TEXTURE_COMPARE_ALL = 0x0000000000300000; /// All texture compare modes are supported.
 
 enum uint BGFX_CAPS_FORMAT_TEXTURE_NONE = 0x00000000; /// Texture format is not supported.
 enum uint BGFX_CAPS_FORMAT_TEXTURE_2D = 0x00000001; /// Texture format is supported.
@@ -567,11 +570,19 @@ enum bgfx_texture_format_t
 	BGFX_TEXTURE_FORMAT_ATCE, /// ATCE RGBA 8 BPP explicit alpha
 	BGFX_TEXTURE_FORMAT_ATCI, /// ATCI RGBA 8 BPP interpolated alpha
 	BGFX_TEXTURE_FORMAT_ASTC4X4, /// ASTC 4x4 8.0 BPP
+	BGFX_TEXTURE_FORMAT_ASTC5X4, /// ASTC 5x4 6.40 BPP
 	BGFX_TEXTURE_FORMAT_ASTC5X5, /// ASTC 5x5 5.12 BPP
+	BGFX_TEXTURE_FORMAT_ASTC6X5, /// ASTC 6x5 4.27 BPP
 	BGFX_TEXTURE_FORMAT_ASTC6X6, /// ASTC 6x6 3.56 BPP
 	BGFX_TEXTURE_FORMAT_ASTC8X5, /// ASTC 8x5 3.20 BPP
 	BGFX_TEXTURE_FORMAT_ASTC8X6, /// ASTC 8x6 2.67 BPP
+	BGFX_TEXTURE_FORMAT_ASTC8X8, /// ASTC 8x8 2.00 BPP
 	BGFX_TEXTURE_FORMAT_ASTC10X5, /// ASTC 10x5 2.56 BPP
+	BGFX_TEXTURE_FORMAT_ASTC10X6, /// ASTC 10x6 2.13 BPP
+	BGFX_TEXTURE_FORMAT_ASTC10X8, /// ASTC 10x8 1.60 BPP
+	BGFX_TEXTURE_FORMAT_ASTC10X10, /// ASTC 10x10 1.28 BPP
+	BGFX_TEXTURE_FORMAT_ASTC12X10, /// ASTC 12x10 1.07 BPP
+	BGFX_TEXTURE_FORMAT_ASTC12X12, /// ASTC 12x12 0.89 BPP
 	BGFX_TEXTURE_FORMAT_UNKNOWN, /// Compressed formats above.
 	BGFX_TEXTURE_FORMAT_R1,
 	BGFX_TEXTURE_FORMAT_A8,
@@ -617,8 +628,11 @@ enum bgfx_texture_format_t
 	BGFX_TEXTURE_FORMAT_RGBA32I,
 	BGFX_TEXTURE_FORMAT_RGBA32U,
 	BGFX_TEXTURE_FORMAT_RGBA32F,
+	BGFX_TEXTURE_FORMAT_B5G6R5,
 	BGFX_TEXTURE_FORMAT_R5G6B5,
+	BGFX_TEXTURE_FORMAT_BGRA4,
 	BGFX_TEXTURE_FORMAT_RGBA4,
+	BGFX_TEXTURE_FORMAT_BGR5A1,
 	BGFX_TEXTURE_FORMAT_RGB5A1,
 	BGFX_TEXTURE_FORMAT_RGB10A2,
 	BGFX_TEXTURE_FORMAT_RG11B10F,
@@ -895,19 +909,21 @@ struct bgfx_init_t
 	bgfx_renderer_type_t type;
 
 	/**
-	 * Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
-	 * device.
+	 * Vendor PCI ID. If set to `BGFX_PCI_ID_NONE`, discrete and integrated
+	 * GPUs will be prioritised.
 	 *   - `BGFX_PCI_ID_NONE` - Autoselect adapter.
 	 *   - `BGFX_PCI_ID_SOFTWARE_RASTERIZER` - Software rasterizer.
 	 *   - `BGFX_PCI_ID_AMD` - AMD adapter.
+	 *   - `BGFX_PCI_ID_APPLE` - Apple adapter.
 	 *   - `BGFX_PCI_ID_INTEL` - Intel adapter.
-	 *   - `BGFX_PCI_ID_NVIDIA` - nVidia adapter.
+	 *   - `BGFX_PCI_ID_NVIDIA` - NVIDIA adapter.
+	 *   - `BGFX_PCI_ID_MICROSOFT` - Microsoft adapter.
 	 */
 	ushort vendorId;
 
 	/**
-	 * Device id. If set to 0 it will select first device, or device with
-	 * matching id.
+	 * Device ID. If set to 0 it will select first device, or device with
+	 * matching ID.
 	 */
 	ushort deviceId;
 	ulong capabilities; /// Capabilities initialization mask (default: UINT64_MAX).
@@ -1022,6 +1038,7 @@ struct bgfx_view_stats_t
 	long cpuTimeEnd; /// CPU (submit) end time.
 	long gpuTimeBegin; /// GPU begin time.
 	long gpuTimeEnd; /// GPU end time.
+	uint gpuFrameNum; /// Frame which generated gpuTimeBegin, gpuTimeEnd.
 }
 
 /// Encoder stats.
@@ -1051,6 +1068,7 @@ struct bgfx_stats_t
 	uint numCompute; /// Number of compute calls submitted.
 	uint numBlit; /// Number of blit calls submitted.
 	uint maxGpuLatency; /// GPU driver latency.
+	uint gpuFrameNum; /// Frame which generated gpuTimeBegin, gpuTimeEnd.
 	ushort numDynamicIndexBuffers; /// Number of used dynamic index buffers.
 	ushort numDynamicVertexBuffers; /// Number of used dynamic vertex buffers.
 	ushort numFrameBuffers; /// Number of used frame buffers.

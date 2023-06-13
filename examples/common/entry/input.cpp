@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -292,7 +292,7 @@ void inputInit()
 
 void inputShutdown()
 {
-	BX_DELETE(entry::getAllocator(), s_input);
+	bx::deleteObject(entry::getAllocator(), s_input);
 }
 
 void inputAddBindings(const char* _name, const InputBinding* _bindings)
@@ -375,8 +375,8 @@ void inputSetMouseLock(bool _lock)
 	if (s_input->m_mouse.m_lock != _lock)
 	{
 		s_input->m_mouse.m_lock = _lock;
-		entry::WindowHandle defaultWindow = { 0 };
-		entry::setMouseLock(defaultWindow, _lock);
+
+		entry::setMouseLock(entry::kDefaultWindowHandle, _lock);
 		if (_lock)
 		{
 			s_input->m_mouse.m_norm[0] = 0.0f;

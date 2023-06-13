@@ -3,9 +3,9 @@ API Reference
 
 
 .. note::
-	
+
     If you're just getting started with bgfx, you might get more out of these simple walkthroughs for how to use bgfx's API:
-    
+
     - `Hello, bgfx! <https://dev.to/pperon/hello-bgfx-4dka>`_
     - `bgfx-minimal-example <https://github.com/jpcy/bgfx-minimal-example#bgfx-minimal-example>`_
     - `Using the bgfx library with C++ on Ubuntu <https://www.sandeepnambiar.com/getting-started-with-bgfx/>`_
@@ -27,8 +27,10 @@ Initialization and Shutdown
 .. doxygendefine:: BGFX_PCI_ID_NONE
 .. doxygendefine:: BGFX_PCI_ID_SOFTWARE_RASTERIZER
 .. doxygendefine:: BGFX_PCI_ID_AMD
+.. doxygendefine:: BGFX_PCI_ID_APPLE
 .. doxygendefine:: BGFX_PCI_ID_INTEL
 .. doxygendefine:: BGFX_PCI_ID_NVIDIA
+.. doxygendefine:: BGFX_PCI_ID_MICROSOFT
 
 .. doxygenstruct:: bgfx::CallbackI
     :members:
@@ -119,6 +121,7 @@ Available Caps
 .. doxygendefine:: BGFX_CAPS_COMPUTE
 .. doxygendefine:: BGFX_CAPS_CONSERVATIVE_RASTER
 .. doxygendefine:: BGFX_CAPS_DRAW_INDIRECT
+.. doxygendefine:: BGFX_CAPS_DRAW_INDIRECT_COUNT
 .. doxygendefine:: BGFX_CAPS_FRAGMENT_DEPTH
 .. doxygendefine:: BGFX_CAPS_FRAGMENT_ORDERING
 .. doxygendefine:: BGFX_CAPS_GRAPHICS_DEBUGGER
@@ -422,6 +425,8 @@ In Views, all draw commands are executed **after** blit and compute commands.
 .. doxygenfunction:: bgfx::submit(ViewId _id, ProgramHandle _program, uint32_t _depth = 0, uint8_t _flags = BGFX_DISCARD_ALL)
 .. doxygenfunction:: bgfx::submit(ViewId _id, ProgramHandle _program, OcclusionQueryHandle _occlusionQuery, uint32_t _depth = 0, uint8_t _flags = BGFX_DISCARD_ALL)
 .. doxygenfunction:: bgfx::submit(ViewId _id, ProgramHandle _program, IndirectBufferHandle _indirectHandle, uint16_t _start = 0, uint16_t _num = 1, uint32_t _depth = 0, uint8_t _flags = BGFX_DISCARD_ALL)
+.. doxygenfunction:: bgfx::submit(ViewId _id, ProgramHandle _program, IndirectBufferHandle _indirectHandle, uint16_t _start, IndexBufferHandle _numHandle, uint32_t _numIndex = 0, uint16_t _numMax = UINT16_MAX, uint32_t _depth = 0, uint8_t _flags = BGFX_DISCARD_ALL)
+
 
 Compute
 ~~~~~~~
@@ -561,13 +566,15 @@ Textures
 Frame Buffers
 ~~~~~~~~~~~~~
 
+.. doxygenstruct:: bgfx::Attachment
+    :members:
+
+.. doxygenfunction:: bgfx::isFrameBufferValid
+
 .. doxygenfunction:: bgfx::createFrameBuffer(uint16_t _width, uint16_t _height, TextureFormat::Enum _format, uint64_t _textureFlags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP)
 .. doxygenfunction:: bgfx::createFrameBuffer(BackbufferRatio::Enum _ratio, TextureFormat::Enum _format, uint64_t _textureFlags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP)
 .. doxygenfunction:: bgfx::createFrameBuffer(uint8_t _num, const TextureHandle *_handles, bool _destroyTextures = false)
 .. doxygenfunction:: bgfx::createFrameBuffer(void *_nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _format = TextureFormat::Count, TextureFormat::Enum _depthFormat = TextureFormat::Count)
-
-.. doxygenstruct:: bgfx::Attachment
-    :members:
 
 .. doxygenfunction:: bgfx::createFrameBuffer(uint8_t _num, const Attachment *_attachment, bool _destroyTextures = false)
 .. doxygenfunction:: bgfx::getTexture

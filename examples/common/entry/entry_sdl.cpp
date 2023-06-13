@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -72,35 +72,6 @@ namespace entry
 #   elif BX_PLATFORM_ANDROID
 		return wmi.info.android.window;
 #	endif // BX_PLATFORM_
-	}
-
-	inline bool sdlSetWindow(SDL_Window* _window)
-	{
-		SDL_SysWMinfo wmi;
-		SDL_VERSION(&wmi.version);
-		if (!SDL_GetWindowWMInfo(_window, &wmi) )
-		{
-			return false;
-		}
-
-		bgfx::PlatformData pd;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-		pd.ndt          = wmi.info.wl.display;
-#		else
-		pd.ndt          = wmi.info.x11.display;
-#		endif
-#	else
-		pd.ndt          = NULL;
-#	endif // BX_PLATFORM_
-		pd.nwh          = sdlNativeWindowHandle(_window);
-
-		pd.context      = NULL;
-		pd.backBuffer   = NULL;
-		pd.backBufferDS = NULL;
-		bgfx::setPlatformData(pd);
-
-		return true;
 	}
 
 	static void sdlDestroyWindow(SDL_Window* _window)
@@ -513,7 +484,6 @@ namespace entry
 
 			s_userEventStart = SDL_RegisterEvents(7);
 
-			sdlSetWindow(m_window[0]);
 			bgfx::renderFrame();
 
 			m_thread.init(MainThreadEntry::threadFunc, &m_mte);
@@ -535,7 +505,7 @@ namespace entry
 			{
 				bx::AllocatorI* allocator = getAllocator();
 				uint32_t size = (uint32_t)bx::getSize(reader);
-				void* data = BX_ALLOC(allocator, size + 1);
+				void* data = bx::alloc(allocator, size + 1);
 				bx::read(reader, data, size, bx::ErrorAssert{});
 				bx::close(reader);
 				((char*)data)[size] = '\0';
@@ -544,7 +514,7 @@ namespace entry
 					DBG("SDL game controller add mapping failed: %s", SDL_GetError());
 				}
 
-				BX_FREE(allocator, data);
+				bx::free(allocator, data);
 			}
 
 			bool exit = false;
@@ -1160,6 +1130,31 @@ namespace entry
 	void setMouseLock(WindowHandle _handle, bool _lock)
 	{
 		sdlPostEvent(SDL_USER_WINDOW_MOUSE_LOCK, _handle, NULL, _lock);
+	}
+
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		return sdlNativeWindowHandle(s_ctx.m_window[_handle.idx]);
+	}
+
+	void* getNativeDisplayHandle()
+	{
+		SDL_SysWMinfo wmi;
+		SDL_VERSION(&wmi.version);
+		if (!SDL_GetWindowWMInfo(s_ctx.m_window[0], &wmi) )
+		{
+			return NULL;
+		}
+
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#		if ENTRY_CONFIG_USE_WAYLAND
+		return wmi.info.wl.display;
+#		else
+		return wmi.info.x11.display;
+#		endif // ENTRY_CONFIG_USE_WAYLAND
+#	else
+		return NULL;
+#	endif // BX_PLATFORM_*
 	}
 
 	int32_t MainThreadEntry::threadFunc(bx::Thread* _thread, void* _userData)

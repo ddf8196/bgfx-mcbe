@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -18,6 +18,10 @@
 #	define DX_CHECK_EXTRA_F ""
 #	define DX_CHECK_EXTRA_ARGS
 #endif // BGFX_CONFIG_DEBUG && BGFX_CONFIG_RENDERER_DIRECT3D9
+
+#ifndef DXGI_ERROR_NOT_CURRENTLY_AVAILABLE
+#	define DXGI_ERROR_NOT_CURRENTLY_AVAILABLE HRESULT(0x887A0022)
+#endif // DXGI_ERROR_NOT_CURRENTLY_AVAILABLE
 
 #define DXGI_FORMAT_ASTC_4X4_TYPELESS     DXGI_FORMAT(133)
 #define DXGI_FORMAT_ASTC_4X4_UNORM        DXGI_FORMAT(134)

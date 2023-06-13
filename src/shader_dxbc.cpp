@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -1235,7 +1235,7 @@ namespace bgfx
 				// 0       1       2       3
 				// 76543210765432107654321076543210
 				// ........        iiiii...........
-				//                 ^---------------- Interploation
+				//                 ^---------------- Interpolation
 
 				_instruction.interpolation = DxbcInterpolation::Enum( (token & UINT32_C(0x0000f800) ) >> 11);
 				break;

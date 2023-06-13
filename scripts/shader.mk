@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2023 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 #
 
@@ -53,14 +53,14 @@ else
 ADDITIONAL_INCLUDES?=
 
 ifeq ($(TARGET), 0)
-VS_FLAGS=--platform windows -p vs_3_0 -O 3
-FS_FLAGS=--platform windows -p ps_3_0 -O 3
+VS_FLAGS=--platform windows -p s_3_0 -O 3
+FS_FLAGS=--platform windows -p s_3_0 -O 3
 SHADER_PATH=shaders/dx9
 else
 ifeq ($(TARGET), 1)
-VS_FLAGS=--platform windows -p vs_5_0 -O 3
-FS_FLAGS=--platform windows -p ps_5_0 -O 3
-CS_FLAGS=--platform windows -p cs_5_0 -O 1
+VS_FLAGS=--platform windows -p s_5_0 -O 3
+FS_FLAGS=--platform windows -p s_5_0 -O 3
+CS_FLAGS=--platform windows -p s_5_0 -O 1
 SHADER_PATH=shaders/dx11
 else
 ifeq ($(TARGET), 2)
@@ -127,7 +127,7 @@ VS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(
 FS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(FS_SOURCES)))))
 CS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(CS_SOURCES)))))
 
-BIN = $(VS_BIN) $(FS_BIN)
+BIN = $(VS_BIN) $(FS_BIN) $(CS_BIN)
 ASM = $(VS_ASM) $(FS_ASM)
 
 ifeq ($(TARGET), $(filter $(TARGET),1 3 4 5 6 7))

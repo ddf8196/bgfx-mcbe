@@ -1,3 +1,5 @@
+#include <bx/string.h>
+
 #ifdef _MSC_VER
 #   define snprintf _snprintf
 #endif
@@ -142,7 +144,7 @@ namespace ImGui
                     if (HexII)
                     {
                         unsigned char byte = mem_data[addr];
-                        if (isprint(byte) )
+                        if (bx::isPrint(byte) )
                         {
                             Text(".%c ", byte);
                         }
@@ -205,7 +207,7 @@ namespace ImGui
 
         AlignTextToFramePadding();
         PushItemWidth(50);
-        PushAllowKeyboardFocus(false);
+        PushTabStop(false);
         int rows_backup = Rows;
         if (DragInt("##rows", &Rows, 0.2f, 4, 32, "%.0f rows"))
         {
@@ -214,7 +216,7 @@ namespace ImGui
             SetWindowSize(new_window_size);
         }
 
-        PopAllowKeyboardFocus();
+        PopTabStop();
         PopItemWidth();
         SameLine();
         Text("Range %0*x..%0*x", addr_digits_count, (int)base_display_addr, addr_digits_count, (int)base_display_addr+mem_size-1);

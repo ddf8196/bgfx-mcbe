@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -492,7 +492,7 @@ namespace bgfx
 			break;
 		}
 
-		return 0;
+		return size;
 	}
 
 	int32_t toString(char* _out, int32_t _size, const Dx9bcInstruction& _instruction)

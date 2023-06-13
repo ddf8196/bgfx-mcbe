@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -159,7 +159,7 @@ namespace bgfx { namespace gl
 		GLint m_height;
 	};
 
-	void GlContext::create(uint32_t _width, uint32_t _height)
+	void GlContext::create(uint32_t _width, uint32_t _height, uint32_t /*_flags*/)
 	{
 		s_opengles = bx::dlopen("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
 		BX_ASSERT(NULL != s_opengles, "OpenGLES dynamic library is not found!");
@@ -316,7 +316,7 @@ namespace bgfx { namespace gl
 
 	void GlContext::destroySwapChain(SwapChainGL* _swapChain)
 	{
-		BX_DELETE(g_allocator, _swapChain);
+		bx::deleteObject(g_allocator, _swapChain);
 	}
 
 	void GlContext::swap(SwapChainGL* _swapChain)

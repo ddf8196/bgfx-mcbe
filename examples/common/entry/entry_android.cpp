@@ -1,13 +1,11 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
 
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_ANDROID
-
-#include <bgfx/platform.h>
 
 #include <bx/thread.h>
 #include <bx/file.h>
@@ -29,18 +27,6 @@ extern "C"
 
 namespace entry
 {
-	///
-	inline void androidSetWindow(::ANativeWindow* _window)
-	{
-		bgfx::PlatformData pd;
-		pd.ndt          = NULL;
-		pd.nwh          = _window;
-		pd.context      = NULL;
-		pd.backBuffer   = NULL;
-		pd.backBufferDS = NULL;
-		bgfx::setPlatformData(pd);
-	}
-
 	struct GamepadRemap
 	{
 		uint16_t  m_keyCode;
@@ -233,7 +219,6 @@ namespace entry
 					if (m_window != m_app->window)
 					{
 						m_window = m_app->window;
-						androidSetWindow(m_window);
 
 						int32_t width  = ANativeWindow_getWidth(m_window);
 						int32_t height = ANativeWindow_getHeight(m_window);
@@ -550,16 +535,33 @@ namespace entry
 		BX_UNUSED(_handle, _lock);
 	}
 
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		if (kDefaultWindowHandle.idx == _handle.idx)
+		{
+			return s_ctx.m_window;
+		}
+
+		return NULL;
+	}
+
+	void* getNativeDisplayHandle()
+	{
+		return NULL;
+	}
+
 	int32_t MainThreadEntry::threadFunc(bx::Thread* _thread, void* _userData)
 	{
 		BX_UNUSED(_thread);
 
 		int32_t result = chdir("/sdcard/bgfx/examples/runtime");
-		BX_ASSERT(0 == result, "Failed to chdir to dir. android.permission.WRITE_EXTERNAL_STORAGE?", errno);
+		BX_ASSERT(0 == result
+			, "Failed to chdir to directory (errno: %d, android.permission.WRITE_EXTERNAL_STORAGE?)."
+			, errno
+			);
 
 		MainThreadEntry* self = (MainThreadEntry*)_userData;
 		result = main(self->m_argc, self->m_argv);
-//		PostMessage(s_ctx.m_hwnd, WM_QUIT, 0, 0);
 		return result;
 	}
 

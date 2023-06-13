@@ -2,7 +2,7 @@ local codegen = require "codegen"
 local idl = codegen.idl "bgfx.idl"
 
 local zig_template = [[
-// Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+// Copyright 2011-2023 Branimir Karadzic. All rights reserved.
 // License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 
 
@@ -407,7 +407,7 @@ function converter.funcs(params)
 		return
 	end
 
-	-- skipp for now, don't know how to handle variadic functions
+	-- skip for now, don't know how to handle variadic functions
 	if func.cname == "dbg_text_printf" or func.cname == "dbg_text_vprintf" then
 		return
 	end
