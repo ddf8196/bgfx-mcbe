@@ -243,12 +243,12 @@ namespace bgfx { namespace metal
 			size += un.regCount*16;
 
 			uint8_t nameSize = (uint8_t)un.name.size();
-			bx::write(_writer, nameSize, &err);
-			bx::write(_writer, un.name.c_str(), nameSize, &err);
-			bx::write(_writer, uint8_t(un.type | fragmentBit), &err);
-			bx::write(_writer, un.num, &err);
-			bx::write(_writer, un.regIndex, &err);
-			bx::write(_writer, un.regCount, &err);
+			bx::write(_shaderWriter, nameSize, &err);
+			bx::write(_shaderWriter, un.name.c_str(), nameSize, &err);
+			bx::write(_shaderWriter, uint8_t(un.type | fragmentBit), &err);
+			bx::write(_shaderWriter, un.num, &err);
+			bx::write(_shaderWriter, un.regIndex, &err);
+			bx::write(_shaderWriter, un.regCount, &err);
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()

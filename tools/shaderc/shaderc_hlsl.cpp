@@ -757,10 +757,10 @@ namespace bgfx { namespace hlsl
 				bx::write(_shaderWriter, nameSize, &err);
 				bx::write(_shaderWriter, un.name.c_str(), nameSize, &err);
 				uint8_t type = uint8_t(un.type | fragmentBit);
-				bx::write(_writer, type, &err);
-				bx::write(_writer, un.num, &err);
-				bx::write(_writer, un.regIndex, &err);
-				bx::write(_writer, un.regCount, &err);
+				bx::write(_shaderWriter, type, &err);
+				bx::write(_shaderWriter, un.num, &err);
+				bx::write(_shaderWriter, un.regIndex, &err);
+				bx::write(_shaderWriter, un.regCount, &err);
 
 				BX_TRACE("%s, %s, %d, %d, %d"
 					, un.name.c_str()

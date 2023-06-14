@@ -359,10 +359,10 @@ namespace bgfx { namespace glsl
 			bx::write(_shaderWriter, nameSize, &err);
 			bx::write(_shaderWriter, un.name.c_str(), nameSize, &err);
 			uint8_t uniformType = uint8_t(un.type);
-			bx::write(_writer, uniformType, &err);
-			bx::write(_writer, un.num, &err);
-			bx::write(_writer, un.regIndex, &err);
-			bx::write(_writer, un.regCount, &err);
+			bx::write(_shaderWriter, uniformType, &err);
+			bx::write(_shaderWriter, un.num, &err);
+			bx::write(_shaderWriter, un.regIndex, &err);
+			bx::write(_shaderWriter, un.regCount, &err);
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()
