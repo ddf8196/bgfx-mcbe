@@ -1324,14 +1324,8 @@ namespace bgfx
 				||  0 == bx::strCmp(typen, "noperspective", 13)
 				||  0 == bx::strCmp(typen, "centroid", 8) )
 				{
-					if ('f' == _options.shaderType
-					||   profile->lang == ShadingLang::GLSL
-					||   profile->lang == ShadingLang::ESSL)
-					{
-						interpolation = typen;
-						usesInterpolationQualifiers = true;
-					}
-
+					interpolation = typen;
+					usesInterpolationQualifiers = true;
 					typen = nextWord(parse);
 				}
 
@@ -1731,6 +1725,17 @@ namespace bgfx
 							);
 					}
 
+					if (profile->lang == ShadingLang::ESSL
+					&&  profile->id < 300)
+					{
+						preprocessor.writef(
+							"#define centroid\n"
+							"#define flat\n"
+							"#define noperspective\n"
+							"#define smooth\n"
+						);
+					}
+
 					// gl_FragColor and gl_FragData are deprecated for essl > 300
 					if (profile->lang == ShadingLang::ESSL
 					&&  profile->id >= 300)
@@ -1836,7 +1841,7 @@ namespace bgfx
 							"#define flat\n"
 							"#define noperspective\n"
 							"#define smooth\n"
-							);
+						);
 					}
 
 					*const_cast<char*>(entry.getPtr() + 4) = '_';
