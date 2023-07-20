@@ -757,7 +757,7 @@ namespace bgfx
 
 	struct TextVideoMemBlitter
 	{
-		void init();
+		void init(uint8_t scale);
 		void shutdown();
 
 		TextureHandle m_texture;
@@ -765,6 +765,7 @@ namespace bgfx
 		TransientIndexBuffer* m_ib;
 		VertexLayout m_layout;
 		ProgramHandle m_program;
+		uint8_t m_scale;
 	};
 
 	struct RendererContextI;
@@ -3129,6 +3130,7 @@ namespace bgfx
 			, m_rtMemoryUsed(0)
 			, m_textureMemoryUsed(0)
 			, m_renderCtx(NULL)
+			, m_headless(false)
 			, m_rendererInitialized(false)
 			, m_exit(false)
 			, m_flipAfterRender(false)
@@ -3166,6 +3168,13 @@ namespace bgfx
 		BGFX_API_FUNC(void reset(uint32_t _width, uint32_t _height, uint32_t _flags, TextureFormat::Enum _format) )
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
+
+			BX_ASSERT(false
+				|| !m_headless
+				|| 0 == _width
+				|| 0 == _height
+				, "Running in headless mode, resolution of non-existing backbuffer can't be larger than 0x0!"
+				);
 
 			const TextureFormat::Enum format = TextureFormat::Count != _format ? _format : m_init.resolution.format;
 
@@ -3249,7 +3258,12 @@ namespace bgfx
 		{
 			BGFX_MUTEX_SCOPE(m_resourceApiLock);
 
-			m_submit->m_textVideoMem->resize(_small, (uint16_t)m_init.resolution.width, (uint16_t)m_init.resolution.height);
+			const uint8_t debugTextScale = m_init.resolution.debugTextScale;
+			m_submit->m_textVideoMem->resize(
+				  _small
+				, (uint16_t)m_init.resolution.width  / debugTextScale
+				, (uint16_t)m_init.resolution.height / debugTextScale
+				);
 			m_submit->m_textVideoMem->clear(_attr);
 		}
 
@@ -5357,6 +5371,7 @@ namespace bgfx
 
 		RendererContextI* m_renderCtx;
 
+		bool m_headless;
 		bool m_rendererInitialized;
 		bool m_exit;
 		bool m_flipAfterRender;
