@@ -2379,28 +2379,36 @@ namespace bgfx
 										bx::stringPrintf(code, "#define varying %s\n"
 											, 'f' == _options.shaderType ? "in" : "out"
 											);
-										bx::stringPrintf(code, "precision highp float;\n");
-										bx::stringPrintf(code, "precision highp int;\n");
-									}
-
-									if (glsl_profile >= 300 && usesTextureArray)
-									{
-										bx::stringPrintf(code, "precision highp sampler2DArray;\n");
 									}
 
 									// Pretend that all extensions are available.
 									// This will be stripped later.
 									if (usesTextureLod)
 									{
-										bx::stringPrintf(code
-											, "#extension GL_EXT_shader_texture_lod : enable\n"
-											  "#define texture2DLod      texture2DLodEXT\n"
-											  "#define texture2DGrad     texture2DGradEXT\n"
-											  "#define texture2DProjLod  texture2DProjLodEXT\n"
-											  "#define texture2DProjGrad texture2DProjGradEXT\n"
-											  "#define textureCubeLod    textureCubeLodEXT\n"
-											  "#define textureCubeGrad   textureCubeGradEXT\n"
+										if (glsl_profile < 300)
+										{
+											bx::stringPrintf(code
+											  , "#extension GL_EXT_shader_texture_lod : enable\n"
+												"#define texture2DLod      texture2DLodEXT\n"
+												"#define texture2DGrad     texture2DGradEXT\n"
+												"#define texture2DProjLod  texture2DProjLodEXT\n"
+												"#define texture2DProjGrad texture2DProjGradEXT\n"
+												"#define textureCubeLod    textureCubeLodEXT\n"
+												"#define textureCubeGrad   textureCubeGradEXT\n"
 											);
+										}
+										else
+										{
+											bx::stringPrintf(code
+											  , "#extension GL_EXT_shader_texture_lod : enable\n"
+												"#define texture2DLod      textureLod\n"
+												"#define texture2DGrad     textureGrad\n"
+												"#define texture2DProjLod  textureProjLod\n"
+												"#define texture2DProjGrad textureProjGrad\n"
+												"#define textureCubeLod    textureLod\n"
+												"#define textureCubeGrad   textureGrad\n"
+											);
+										}
 									}
 
 									if (!bx::findIdentifierMatch(input, s_OES_standard_derivatives).isEmpty() )
@@ -2456,6 +2464,15 @@ namespace bgfx
 										bx::stringPrintf(code
 											, "#extension GL_EXT_texture_array : enable\n"
 											);
+									}
+
+									if (glsl_profile > 100 && 'f' == _options.shaderType)
+									{
+										bx::stringPrintf(code, "#if GL_FRAGMENT_PRECISION_HIGH\n");
+										bx::stringPrintf(code, "precision highp float;\n");
+										bx::stringPrintf(code, "#else\n");
+										bx::stringPrintf(code, "precision mediump float;\n");
+										bx::stringPrintf(code, "#endif\n");
 									}
 
 									if (glsl_profile == 100)
