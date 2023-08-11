@@ -1483,18 +1483,18 @@ namespace bgfx
 			if ('f' == _options.shaderType)
 			{
 				bx::write(_shaderWriter, BGFX_CHUNK_MAGIC_FSH, &err);
+				bx::write(_shaderWriter, inputHash, &err);
 			}
 			else if ('v' == _options.shaderType)
 			{
 				bx::write(_shaderWriter, BGFX_CHUNK_MAGIC_VSH, &err);
+				bx::write(_shaderWriter, outputHash, &err);
 			}
 			else
 			{
 				bx::write(_shaderWriter, BGFX_CHUNK_MAGIC_CSH, &err);
+				bx::write(_shaderWriter, outputHash, &err);
 			}
-
-			bx::write(_shaderWriter, inputHash, &err);
-			bx::write(_shaderWriter, outputHash, &err);
 		}
 
 		if (raw)
