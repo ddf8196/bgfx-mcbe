@@ -14,8 +14,8 @@ jobs:
       fail-fast: true
       matrix:
         include: [
-#          { msystem: MINGW64, project: 'mingw-gcc', bindir: 'win64_mingw-gcc' },
-          { msystem: CLANG64, project: 'mingw-clang', bindir: 'win64_mingw-clang' },
+          { msystem: MINGW64, project: 'mingw-gcc', bindir: 'win64_mingw-gcc' },
+#         { msystem: CLANG64, project: 'mingw-clang', bindir: 'win64_mingw-clang' },
         ]
     name: mingw-${{ matrix.msystem }}
     runs-on: windows-latest
@@ -29,6 +29,8 @@ jobs:
         with:
           repository: bkaradzic/bx
           path: bx
+          fetch-depth: 0
+      - run: cd bx && git checkout 198cd12 || cd ..
       - name: Checkout bimg
         uses: actions/checkout@v4
         with:
@@ -45,12 +47,12 @@ jobs:
         shell: msys2 {0}
         run: |
           cd bgfx
-          make ${{ matrix.project }}-release64 -j$(nproc) AR=ar CC=cc CXX=c++ MINGW=$MINGW_PREFIX
+          make shaderc -j$(nproc) AR=ar CC=cc CXX=c++ MINGW=$MINGW_PREFIX
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        with: 
+        with:
           name: shaderc-win-x64.exe
-          path: ./bgfx/.buildk/${{ matrix.bindir }}/bin/shadercRelease.exe
+          path: ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
   linux:
     strategy:
       fail-fast: true
@@ -70,6 +72,8 @@ jobs:
         with:
           repository: bkaradzic/bx
           path: bx
+          fetch-depth: 0
+      - run: cd bx && git checkout 198cd12 || cd ..
       - name: Checkout bimg
         uses: actions/checkout@v4
         with:
@@ -79,10 +83,10 @@ jobs:
         run: |
           sudo apt install libgl-dev
           cd bgfx
-          make -j$(nproc) linux-${{ matrix.config }}64
+          make -j$(nproc) shaderc
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        with: 
+        with:
           name: shaderc-linux-x64
           path: ./bgfx/.build/linux64_gcc/bin/shaderc${{ matrix.binsuffix }}
   osx:
@@ -104,6 +108,8 @@ jobs:
         with:
           repository: bkaradzic/bx
           path: bx
+          fetch-depth: 0
+      - run: cd bx && git checkout 198cd12 || cd ..
       - name: Checkout bimg
         uses: actions/checkout@v4
         with:
@@ -112,10 +118,10 @@ jobs:
       - name: Build
         run: |
           cd bgfx
-          make -j$(sysctl -n hw.physicalcpu) osx-x64-${{ matrix.config }}
+          make -j$(sysctl -n hw.physicalcpu) shaderc
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        with: 
+        with:
           name: shaderc-osx-x64
           path: ./bgfx/.build/osx-x64/bin/shaderc${{ matrix.binsuffix }}
   android:
@@ -132,7 +138,7 @@ jobs:
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
-          ndk-version: r25b
+          ndk-version: r25c
           add-to-path: false
       - name: Checkout bgfx
         uses: actions/checkout@v4
@@ -143,6 +149,8 @@ jobs:
         with:
           repository: bkaradzic/bx
           path: bx
+          fetch-depth: 0
+      - run: cd bx && git checkout 198cd12 || cd ..
       - name: Checkout bimg
         uses: actions/checkout@v4
         with:
@@ -150,8 +158,12 @@ jobs:
           path: bimg
       - name: Build
         run: |
+          sudo apt install libgl-dev
+          ar -cr $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libpthread.a
+          ar -cr $ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libpthread.a
           cd bgfx
-          make -j$(sysctl -n hw.physicalcpu) android-${{ matrix.platform }}
+          make .build/projects/gmake-android-${{ matrix.platform }}
+          make -j$(nproc) -R -C .build/projects/gmake-android-${{ matrix.platform }} shaderc config=release
         env:
           ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
       - name: Check
@@ -160,6 +172,6 @@ jobs:
           ls -lash ".build/android-${{ matrix.platform }}/bin"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        with: 
-          name: shaderc-linux-${{ matrix.platform }}
-          path: ./bgfx/.build/android-${{ matrix.platform }}/bin/shadercRelease
+        with:
+          name: shaderc-android-${{ matrix.platform }}
+          path: ./bgfx/.build/android-${{ matrix.platform }}/bin/libshadercRelease
