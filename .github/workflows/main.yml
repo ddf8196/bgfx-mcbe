@@ -48,14 +48,13 @@ jobs:
         run: |
           cd bgfx
           make shaderc -j$(nproc) AR=ar CC=cc CXX=c++ MINGW=$MINGW_PREFIX
-      - run: cd ./bgfx/.build/${{ matrix.bindir }}/bin/
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: shaderc-win-x64.exe
-          path: shadercRelease.exe
+          path: ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
       - name: Zip binary
-        run: zip shaderc-win-x64.zip shadercRelease.exe
+        run: zip -j shaderc-win-x64.zip ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
       - name: Publish binary
         uses: softprops/action-gh-release@v2
         with:
@@ -93,14 +92,13 @@ jobs:
           sudo apt install libgl-dev
           cd bgfx
           make -j$(nproc) shaderc
-      - run: cd ./bgfx/.build/linux64_gcc/bin/
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: shaderc-linux-x64
-          path: shaderc${{ matrix.binsuffix }}
+          path: ./bgfx/.build/linux64_gcc/bin/shaderc${{ matrix.binsuffix }}
       - name: Zip binary
-        run: zip shaderc-linux-x64.zip shaderc${{ matrix.binsuffix }}
+        run: zip -j shaderc-linux-x64.zip ./bgfx/.build/linux64_gcc/bin/shaderc${{ matrix.binsuffix }}
       - name: Publish binary
         uses: softprops/action-gh-release@v2
         with:
@@ -137,14 +135,13 @@ jobs:
         run: |
           cd bgfx
           make -j$(sysctl -n hw.physicalcpu) shaderc
-      - run: cd ./bgfx/.build/osx-x64/bin/
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: shaderc-osx-x64
-          path: shaderc${{ matrix.binsuffix }}
+          path: ./bgfx/.build/osx-x64/bin/shaderc${{ matrix.binsuffix }}
       - name: Zip binary
-        run: zip shaderc-osx-x64.zip shaderc${{ matrix.binsuffix }}
+        run: zip -j shaderc-osx-x64.zip ./bgfx/.build/osx-x64/bin/shaderc${{ matrix.binsuffix }}
       - name: Publish binary
         uses: softprops/action-gh-release@v2
         with:
@@ -197,14 +194,13 @@ jobs:
         run: |
           cd bgfx
           ls -lash ".build/android-${{ matrix.platform }}/bin"
-      - run: cd ./bgfx/.build/android-${{ matrix.platform }}/bin/
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: shaderc-android-${{ matrix.platform }}
-          path: libshadercRelease
+          path: ./bgfx/.build/android-${{ matrix.platform }}/bin/libshadercRelease
       - name: Zip binary
-        run: zip shaderc-android-${{ matrix.platform }}.zip libshadercRelease
+        run: zip -j shaderc-android-${{ matrix.platform }}.zip ./bgfx/.build/android-${{ matrix.platform }}/bin/libshadercRelease
       - name: Publish binary
         uses: softprops/action-gh-release@v2
         with:
