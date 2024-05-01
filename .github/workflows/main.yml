@@ -54,7 +54,7 @@ jobs:
           name: shaderc-win-x64.exe
           path: ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
       - name: Zip binary
-        run: zip -j shaderc-win-x64.zip ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
+        run: Compress-Archive -Path ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe -Destination shaderc-win-x64.zip
       - name: Publish binary
         uses: softprops/action-gh-release@v2
         with:
