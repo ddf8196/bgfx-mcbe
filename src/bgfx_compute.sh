@@ -57,8 +57,14 @@
 		_type _name[];                                          \
 	}
 
+#define __BUFFER(_name, _type, _reg)                \
+	layout(std430, binding=_reg) buffer _name ## Buffer \
+	{                                                           \
+		_type _name[];                                          \
+	}
+
 #define BUFFER_RO(_name, _type, _reg) __BUFFER_XX(_name, _type, _reg, readonly)
-#define BUFFER_RW(_name, _type, _reg) __BUFFER_XX(_name, _type, _reg, readwrite)
+#define BUFFER_RW(_name, _type, _reg) __BUFFER(_name, _type, _reg)
 #define BUFFER_WR(_name, _type, _reg) __BUFFER_XX(_name, _type, _reg, writeonly)
 
 #define NUM_THREADS(_x, _y, _z) layout (local_size_x = _x, local_size_y = _y, local_size_z = _z) in;
@@ -139,15 +145,9 @@
 
 #define UIMAGE3D_RW(_name, _format, _reg) IMAGE3D_RW(_name, _format, _reg)
 
-#if BGFX_SHADER_LANGUAGE_METAL || BGFX_SHADER_LANGUAGE_SPIRV
 #define BUFFER_RO(_name, _struct, _reg) StructuredBuffer<_struct>   _name : REGISTER(t, _reg)
 #define BUFFER_RW(_name, _struct, _reg) RWStructuredBuffer <_struct> _name : REGISTER(u, _reg)
 #define BUFFER_WR(_name, _struct, _reg) BUFFER_RW(_name, _struct, _reg)
-#else
-#define BUFFER_RO(_name, _struct, _reg) Buffer<_struct>   _name : REGISTER(t, _reg)
-#define BUFFER_RW(_name, _struct, _reg) RWBuffer<_struct> _name : REGISTER(u, _reg)
-#define BUFFER_WR(_name, _struct, _reg) BUFFER_RW(_name, _struct, _reg)
-#endif
 
 #define NUM_THREADS(_x, _y, _z) [numthreads(_x, _y, _z)]
 
@@ -290,6 +290,31 @@ __IMAGE_IMPL_ATOMIC(uint,       x,    uvec4, xxxx)
 #define groupMemoryBarrier()         GroupMemoryBarrierWithGroupSync()
 
 #endif // BGFX_SHADER_LANGUAGE_GLSL
+
+#define IMAGE2D_RO_AUTOREG( _name, _format) IMAGE2D_RO(_name, _format, _name ## _REG)
+#define UIMAGE2D_RO_AUTOREG(_name, _format) UIMAGE2D_RO(_name, _format, _name ## _REG)
+#define IMAGE2D_WR_AUTOREG( _name, _format) IMAGE2D_WR(_name, _format, _name ## _REG)
+#define UIMAGE2D_WR_AUTOREG(_name, _format) UIMAGE2D_WR(_name, _format, _name ## _REG)
+#define IMAGE2D_RW_AUTOREG( _name, _format) IMAGE2D_RW(_name, _format, _name ## _REG)
+#define UIMAGE2D_RW_AUTOREG(_name, _format) UIMAGE2D_RW(_name, _format, _name ## _REG)
+
+#define IMAGE2D_ARRAY_RO_AUTOREG( _name, _format) IMAGE2D_ARRAY_RO(_name, _format, _name ## _REG)
+#define UIMAGE2D_ARRAY_RO_AUTOREG(_name, _format) UIMAGE2D_ARRAY_RO(_name, _format, _name ## _REG)
+#define IMAGE2D_ARRAY_WR_AUTOREG( _name, _format) IMAGE2D_ARRAY_WR(_name, _format, _name ## _REG)
+#define UIMAGE2D_ARRAY_WR_AUTOREG(_name, _format) UIMAGE2D_ARRAY_WR(_name, _format, _name ## _REG)
+#define IMAGE2D_ARRAY_RW_AUTOREG( _name, _format) IMAGE2D_ARRAY_RW(_name, _format, _name ## _REG)
+#define UIMAGE2D_ARRAY_RW_AUTOREG(_name, _format) UIMAGE2D_ARRAY_RW(_name, _format, _name ## _REG)
+
+#define IMAGE3D_RO_AUTOREG( _name, _format) IMAGE3D_RO(_name, _format, _name ## _REG)
+#define UIMAGE3D_RO_AUTOREG(_name, _format) UIMAGE3D_RO(_name, _format, _name ## _REG)
+#define IMAGE3D_WR_AUTOREG( _name, _format) IMAGE3D_WR(_name, _format, _name ## _REG)
+#define UIMAGE3D_WR_AUTOREG(_name, _format) UIMAGE3D_WR(_name, _format, _name ## _REG)
+#define IMAGE3D_RW_AUTOREG( _name, _format) IMAGE3D_RW(_name, _format, _name ## _REG)
+#define UIMAGE3D_RW_AUTOREG(_name, _format) UIMAGE3D_RW(_name, _format, _name ## _REG)
+
+#define BUFFER_RO_AUTOREG(_name, _type) BUFFER_RO(_name, _type, _name ## _REG)
+#define BUFFER_RW_AUTOREG(_name, _type) BUFFER_RW(_name, _type, _name ## _REG)
+#define BUFFER_WR_AUTOREG(_name, _type) BUFFER_WR(_name, _type, _name ## _REG)
 
 #define dispatchIndirect( \
 	  _buffer             \

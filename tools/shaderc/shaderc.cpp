@@ -241,6 +241,19 @@ namespace bgfx
 		NULL
 	};
 
+	static const char* s_EXT_texture_cube_map_array[] =
+	{
+
+		"iimageCubeArray",
+		"imageCubeArray",
+		"isamplerCubeArray",
+		"samplerCubeArray",
+		"samplerCubeArrayShadow",
+		"uimageCubeArray",
+		"usamplerCubeArray",
+		NULL
+	};
+
 	static const char* s_ARB_texture_multisample[] =
 	{
 		"sampler2DMS",
@@ -2224,13 +2237,14 @@ namespace bgfx
 									&& !bx::findIdentifierMatch(input, s_ARB_gpu_shader5).isEmpty()
 									;
 
-								const bool usesInstanceID         = !bx::findIdentifierMatch(input, "gl_InstanceID").isEmpty();
-								const bool usesGpuShader4         = !bx::findIdentifierMatch(input, s_EXT_gpu_shader4).isEmpty();
-								const bool usesTexelFetch         = !bx::findIdentifierMatch(input, s_texelFetch).isEmpty();
-								const bool usesTextureMS          = !bx::findIdentifierMatch(input, s_ARB_texture_multisample).isEmpty();
-								const bool usesTextureArray       = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
-								const bool usesPacking            = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
-								const bool usesViewportLayerArray = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
+								const bool usesInstanceID          = !bx::findIdentifierMatch(input, "gl_InstanceID").isEmpty();
+								const bool usesGpuShader4          = !bx::findIdentifierMatch(input, s_EXT_gpu_shader4).isEmpty();
+								const bool usesTexelFetch          = !bx::findIdentifierMatch(input, s_texelFetch).isEmpty();
+								const bool usesTextureMS           = !bx::findIdentifierMatch(input, s_ARB_texture_multisample).isEmpty();
+								const bool usesTextureArray        = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
+								const bool usesCubemapTextureArray = !bx::findIdentifierMatch(input, s_EXT_texture_cube_map_array).isEmpty();
+								const bool usesPacking             = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
+								const bool usesViewportLayerArray  = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
 								const bool usesUnsignedVecs        = !bx::findIdentifierMatch(preprocessedInput, s_unsignedVecs).isEmpty();
 
 								if (profile->lang != ShadingLang::ESSL)
@@ -2464,6 +2478,13 @@ namespace bgfx
 										bx::stringPrintf(code
 											, "#extension GL_EXT_texture_array : enable\n"
 											);
+									}
+
+									if (usesCubemapTextureArray)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_EXT_texture_cube_map_array : enable\n"
+										);
 									}
 
 									if (glsl_profile > 100 && 'f' == _options.shaderType)

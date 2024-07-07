@@ -328,7 +328,9 @@ namespace bgfx { namespace spirv
 		"BgfxISampler3D",
 		"BgfxUSampler3D",
 		"BgfxSamplerCube",
+		"BgfxSamplerCubeArray",
 		"BgfxSamplerCubeShadow",
+		"BgfxSamplerCubeArrayShadow"
 		"BgfxSampler2DMS",
 	};
 
