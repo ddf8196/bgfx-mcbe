@@ -241,6 +241,19 @@ namespace bgfx
 		NULL
 	};
 
+	static const char* s_EXT_texture_cube_map_array[] =
+	{
+
+		"iimageCubeArray",
+		"imageCubeArray",
+		"isamplerCubeArray",
+		"samplerCubeArray",
+		"samplerCubeArrayShadow",
+		"uimageCubeArray",
+		"usamplerCubeArray",
+		NULL
+	};
+
 	static const char* s_ARB_texture_multisample[] =
 	{
 		"sampler2DMS",
@@ -265,10 +278,13 @@ namespace bgfx
 		NULL
 	};
 
-	static const char* s_unsignedVecs[] =
+	static const char* s_integerVecs[] =
 	{
+		"ivec2",
 		"uvec2",
+		"ivec3",
 		"uvec3",
+		"ivec4",
 		"uvec4",
 		NULL
 	};
@@ -2224,14 +2240,15 @@ namespace bgfx
 									&& !bx::findIdentifierMatch(input, s_ARB_gpu_shader5).isEmpty()
 									;
 
-								const bool usesInstanceID         = !bx::findIdentifierMatch(input, "gl_InstanceID").isEmpty();
-								const bool usesGpuShader4         = !bx::findIdentifierMatch(input, s_EXT_gpu_shader4).isEmpty();
-								const bool usesTexelFetch         = !bx::findIdentifierMatch(input, s_texelFetch).isEmpty();
-								const bool usesTextureMS          = !bx::findIdentifierMatch(input, s_ARB_texture_multisample).isEmpty();
-								const bool usesTextureArray       = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
-								const bool usesPacking            = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
-								const bool usesViewportLayerArray = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
-								const bool usesUnsignedVecs        = !bx::findIdentifierMatch(preprocessedInput, s_unsignedVecs).isEmpty();
+								const bool usesInstanceID          = !bx::findIdentifierMatch(input, "gl_InstanceID").isEmpty();
+								const bool usesGpuShader4          = !bx::findIdentifierMatch(input, s_EXT_gpu_shader4).isEmpty();
+								const bool usesTexelFetch          = !bx::findIdentifierMatch(input, s_texelFetch).isEmpty();
+								const bool usesTextureMS           = !bx::findIdentifierMatch(input, s_ARB_texture_multisample).isEmpty();
+								const bool usesTextureArray        = !bx::findIdentifierMatch(input, s_textureArray).isEmpty();
+								const bool usesCubemapTextureArray = !bx::findIdentifierMatch(input, s_EXT_texture_cube_map_array).isEmpty();
+								const bool usesPacking             = !bx::findIdentifierMatch(input, s_ARB_shading_language_packing).isEmpty();
+								const bool usesViewportLayerArray  = !bx::findIdentifierMatch(input, s_ARB_shader_viewport_layer_array).isEmpty();
+								const bool usesIntegerVecs         = !bx::findIdentifierMatch(preprocessedInput, s_integerVecs).isEmpty();
 
 								if (profile->lang != ShadingLang::ESSL)
 								{
@@ -2239,11 +2256,11 @@ namespace bgfx
 										|| !bx::findIdentifierMatch(input, s_130).isEmpty()
 										|| usesInterpolationQualifiers
 										|| usesTexelFetch
-										|| usesUnsignedVecs
+										|| usesIntegerVecs
 										) );
 
-									bx::stringPrintf(code, "#version %d\n", need130 ? 130 : glsl_profile);
-									glsl_profile = 130;
+									glsl_profile = need130 ? 130 : glsl_profile;
+									bx::stringPrintf(code, "#version %d\n", glsl_profile);
 
 									if (need130)
 									{
@@ -2322,15 +2339,6 @@ namespace bgfx
 											);
 									}
 
-									if (130 > glsl_profile)
-									{
-										bx::stringPrintf(code,
-											"#define ivec2 vec2\n"
-											"#define ivec3 vec3\n"
-											"#define ivec4 vec4\n"
-											);
-									}
-
 									if (ARB_shader_texture_lod)
 									{
 										bx::stringPrintf(code,
@@ -2367,7 +2375,7 @@ namespace bgfx
 								}
 								else
 								{
-									if ((glsl_profile < 300) && usesUnsignedVecs)
+									if ((glsl_profile < 300) && usesIntegerVecs)
 									{
 										glsl_profile = 300;
 									}
@@ -2464,6 +2472,13 @@ namespace bgfx
 										bx::stringPrintf(code
 											, "#extension GL_EXT_texture_array : enable\n"
 											);
+									}
+
+									if (usesCubemapTextureArray)
+									{
+										bx::stringPrintf(code
+											, "#extension GL_EXT_texture_cube_map_array : enable\n"
+										);
 									}
 
 									if (glsl_profile > 100 && 'f' == _options.shaderType)

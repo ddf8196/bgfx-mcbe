@@ -53,6 +53,14 @@ jobs:
         with:
           name: shaderc-win-x64.exe
           path: ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe
+      - name: Zip binary
+        run: Compress-Archive -Path ./bgfx/.build/${{ matrix.bindir }}/bin/shadercRelease.exe -Destination shaderc-win-x64.zip
+      - name: Publish binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: shaderc-win-x64.zip
+          tag_name: binaries
+          fail_on_unmatched_files: true
   linux:
     strategy:
       fail-fast: true
@@ -89,6 +97,14 @@ jobs:
         with:
           name: shaderc-linux-x64
           path: ./bgfx/.build/linux64_gcc/bin/shaderc${{ matrix.binsuffix }}
+      - name: Zip binary
+        run: zip -j shaderc-linux-x64.zip ./bgfx/.build/linux64_gcc/bin/shaderc${{ matrix.binsuffix }}
+      - name: Publish binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: shaderc-linux-x64.zip
+          tag_name: binaries
+          fail_on_unmatched_files: true
   osx:
     strategy:
       fail-fast: true
@@ -124,6 +140,14 @@ jobs:
         with:
           name: shaderc-osx-x64
           path: ./bgfx/.build/osx-x64/bin/shaderc${{ matrix.binsuffix }}
+      - name: Zip binary
+        run: zip -j shaderc-osx-x64.zip ./bgfx/.build/osx-x64/bin/shaderc${{ matrix.binsuffix }}
+      - name: Publish binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: shaderc-osx-x64.zip
+          tag_name: binaries
+          fail_on_unmatched_files: true
   android:
     strategy:
       fail-fast: true
@@ -175,3 +199,11 @@ jobs:
         with:
           name: shaderc-android-${{ matrix.platform }}
           path: ./bgfx/.build/android-${{ matrix.platform }}/bin/libshadercRelease
+      - name: Zip binary
+        run: zip -j shaderc-android-${{ matrix.platform }}.zip ./bgfx/.build/android-${{ matrix.platform }}/bin/libshadercRelease
+      - name: Publish binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: shaderc-android-${{ matrix.platform }}.zip
+          tag_name: binaries
+          fail_on_unmatched_files: true

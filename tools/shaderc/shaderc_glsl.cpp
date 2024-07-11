@@ -227,6 +227,23 @@ namespace bgfx { namespace glsl
 					parse = bx::strLTrimSpace(bx::strFindNl(bx::StringView(eol.getPtr(), parse.getTerm() ) ) );
 				}
 			}
+
+			// Insert #version directive.
+			{
+				std::string versionString = "#version " + std::to_string(_version);
+				const std::string esEnding = "_es";
+				
+				if (
+					_version > 100 && _options.profile.size() >= esEnding.size() &&
+        			_options.profile.compare(_options.profile.size() - esEnding.size(), esEnding.size(), esEnding) == 0
+					) 
+				{
+					versionString.append(" es");
+				}
+				versionString.append("\n");
+				out.insert(0, versionString);
+				optimizedShader = out.c_str();
+			}
 		}
 		else
 		{
